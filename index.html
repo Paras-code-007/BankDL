@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.1.1/tailwind.min.css" />
+    <link rel="stylesheet" href="./prism.css">
+    <script defer src="./prism.js"></script>
+    <title>Project</title>
+</head>
+<body class="bg-gray-100">
+
+    <div class="relative w-screen" style="height: 400px;">
+        <img class="w-screen h-screen absolute fixed z-0" src="./images/Group 1.jpg" alt="background">
+
+        <div class="flex-col items-center relative top-16 justify-center pt-10 h-52">
+            <div class="text-8xl text-gray-700 z-10 font-extrabold text-center m-5  ">Bank Project</div>
+            <div class="text-3xl text-gray-700 z-10 font-extrabold text-center   flex justify-center py-5"><p class="text-center" style="width: 700px;">To generate the Neural network for predicting whether the user will leave the Bank or not.</p></div>
+        </div>
+    </div>
+
+    <img class="w-screen h-screen absolute" src="./images/bg2.jpg" alt="background" style="top: 100vh;">
+    <img class="w-screen h-screen absolute" src="./images/bg3.jpg" alt="background" style="top: 200vh;">
+    <img class="w-screen h-screen absolute" src="./images/bg3.jpg" alt="background" style="top: 300vh; transform: scaleY(-1);">
+    <img class="w-screen h-screen absolute" src="./images/bg4.jpg" alt="background" style="top: 400vh;">
+    <img class="w-screen h-screen absolute" src="./images/bg5.jpg" alt="background" style="top: 500vh;">
+
+    <div class="w-screen flex-col justify-center items-center z-10 relative">
+        <div class="relative text-3xl text-gray-700 z-10 font-extrabold text-center flex justify-center py-5"><p class="text-center  " style="width: 700px;">Code for the Project</p></div>
+
+        <div class="flex w-screen items-center justify-center  ">
+        <pre class="z-20 relative self-center" style="height: 600px; width: 900px;">
+                    <code class="language-python">
+
+    # Artificial Neural Network
+
+    # Installing Theano
+    # pip install --upgrade --no-deps git+git://github.com/Theano/Theano.git
+
+    # Installing Tensorflow
+    # pip install tensorflow
+
+    # Installing Keras
+    # pip install --upgrade keras
+
+    # Part 1 - Data Preprocessing
+
+    # Importing the libraries
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import pandas as pd
+
+    # Importing the dataset
+    dataset = pd.read_csv('Churn_Modelling.csv')
+    X = dataset.iloc[:, 3:13].values
+    y = dataset.iloc[:, 13].values
+
+    # Encoding categorical data
+    from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+    labelencoder_X_1 = LabelEncoder()
+    X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
+    labelencoder_X_2 = LabelEncoder()
+    X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
+    onehotencoder = OneHotEncoder(categorical_features = [1])
+    X = onehotencoder.fit_transform(X).toarray()
+    X = X[:, 1:]
+
+    # Splitting the dataset into the Training set and Test set
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+
+    # Feature Scaling
+    from sklearn.preprocessing import StandardScaler
+    sc = StandardScaler()
+    X_train = sc.fit_transform(X_train)
+    X_test = sc.transform(X_test)
+
+    # Part 2 - Now let's make the ANN!
+
+    # Importing the Keras libraries and packages
+    import keras
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.layers import Dropout
+
+    # Initialising the ANN
+    classifier = Sequential()
+
+    # Adding the input layer and the first hidden layer
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+    # classifier.add(Dropout(p = 0.1))
+
+    # Adding the second hidden layer
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
+    # classifier.add(Dropout(p = 0.1))
+
+    # Adding the output layer
+    classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+
+    # Compiling the ANN
+    classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+    # Fitting the ANN to the Training set
+    classifier.fit(X_train, y_train, batch_size = 32, epochs = 100)
+
+    # Part 3 - Making predictions and evaluating the model
+
+    # Predicting the Test set results
+    y_pred = classifier.predict(X_test)
+    y_pred = (y_pred > 0.5)
+
+    # Predicting a single new observation
+    """Predict if the customer with the following informations will leave the bank:
+    Geography: France
+    Credit Score: 600
+    Gender: Male
+    Age: 40
+    Tenure: 3
+    Balance: 60000
+    Number of Products: 2
+    Has Credit Card: Yes
+    Is Active Member: Yes
+    Estimated Salary: 50000"""
+    new_prediction = classifier.predict(sc.transform(np.array([[0.0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])))
+    new_prediction = (new_prediction > 0.5)
+
+    # Making the Confusion Matrix
+    from sklearn.metrics import confusion_matrix
+    cm = confusion_matrix(y_test, y_pred)
+
+    # Part 4 - Evaluating, Improving and Tuning the ANN
+
+    # Evaluating the ANN
+    from keras.wrappers.scikit_learn import KerasClassifier
+    from sklearn.model_selection import cross_val_score
+    from keras.models import Sequential
+    from keras.layers import Dense
+    def build_classifier():
+    classifier = Sequential()
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
+    classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+    classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+    return classifier
+    classifier = KerasClassifier(build_fn = build_classifier, batch_size = 10, epochs = 100)
+    accuracies = cross_val_score(estimator = classifier, X = X_train, y = y_train, cv = 10)
+    mean = accuracies.mean()
+    variance = accuracies.std()
+
+    # Improving the ANN
+    # Dropout Regularization to reduce overfitting if needed
+
+    # Tuning the ANN
+    from keras.wrappers.scikit_learn import KerasClassifier
+    from sklearn.model_selection import GridSearchCV
+    from keras.models import Sequential
+    from keras.layers import Dense
+    def build_classifier(optimizer):
+    classifier = Sequential()
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
+    classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+    classifier.compile(optimizer = optimizer, loss = 'binary_crossentropy', metrics = ['accuracy'])
+    return classifier
+    classifier = KerasClassifier(build_fn = build_classifier)
+    parameters = {'batch_size': [25, 32],
+    'epochs': [100, 500],
+    'optimizer': ['adam', 'rmsprop']}
+    grid_search = GridSearchCV(estimator = classifier,
+    param_grid = parameters,
+    scoring = 'accuracy',
+    cv = 10)
+    grid_search = grid_search.fit(X_train, y_train)
+    best_parameters = grid_search.best_params_
+    best_accuracy = grid_search.best_score_
+
+                    </code>
+                </pre>
+        </div>
+
+    </div>
+
+    <div class="relative mt-12 w-9/12 mx-auto text-gray-700">
+        <p class="font-bold text-center text-2xl">Our Data Contains the following attributes:</p>
+        <pre>
+            <ul class="list-disc ml-10 flex place-items-center justify-evenly flex-wrap flex-auto text-lg font-semibold">
+                <li class="mx-5 my-1">RowNumber</li>
+                <li class="mx-5 my-1">CustomerId</li>
+                <li class="mx-5 my-1">Surname</li>
+                <li class="mx-5 my-1">CreditScore</li>
+                <li class="mx-5 my-1">Geography </li>
+                <li class="mx-5 my-1">Gender</li>
+                <li class="mx-5 my-1">Age</li>
+                <li class="mx-5 my-1">Tenure</li>
+                <li class="mx-5 my-1">Balance</li>
+                <li class="mx-5 my-1">NumOfProducts</li>
+                <li class="mx-5 my-1">HasCrCard</li>
+                <li class="mx-5 my-1">IsActiveMember</li>
+                <li class="mx-5 my-1">EstimatedSalary</li>
+                <li class="mx-5 my-1">Exited</li>
+            </ul>
+        </pre>
+
+        <div class="mt-5">
+            <div class="font-bold text-center text-6xl">Explantion</div>
+
+            <!-- Component -->
+            <div class="w-full mx-auto">
+                <div class="text-center mt-4 py-2 font-medium text-xl"><span class="font-extrabold">Step 1=></span> To import important libraries for implementing the Neural Network and Processing the Data as well.</div>
+                <div class="flex justify-center">
+                    <pre class="w-80 text-center">
+                        <code class="language-python">
+    import numpy as np
+    import matplotlib.pyplot as plt
+    import pandas as pd
+                        </code>
+                    </pre>
+                </div>
+            </div>
+
+            <div class=" mt-10 w-full mx-auto">
+                <div class="text-center mt-4 py-2 font-medium text-xl"><span class="font-extrabold">Step 2=></span> To import the Dataset and specifying the Variables to the Data parts.
+                Here, we have partitioned the data in “x” and “y”, where “x” consists of all the parameters required for prediction of
+                scenario. <br> And “y” holds the Boolean value of scenario being either true or false.</div>
+                <div class="flex justify-center">
+                    <pre class="text-center" style="width: 450px;">
+                        <code class="language-python">
+    dataset = pd.read_csv('Churn_Modelling.csv')
+    X = dataset.iloc[:, 3:13].values
+    y = dataset.iloc[:, 13].values
+
+                        </code>
+                    </pre>
+                </div>
+                <div class="px-16 my-3">
+                    <img src="./images/table.png" alt="demo-table">
+                </div>
+            </div>
+
+            <div class="mt-10 w-full mx-auto">
+                <div class="text-center mt-4 py-2 font-medium text-xl"><span class="font-extrabold">Step 3=></span> Here, we must encode our data using <b>“OneHotEncoder”</b>.
+</div>
+                <div class="flex justify-center">
+                    <pre class="text-center" style="width: 600px;">
+                        <code class="language-python">
+    from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+    labelencoder_X_1 = LabelEncoder()
+    X[:, 1] = labelencoder_X_1.fit_transform(X[:, 1])
+    labelencoder_X_2 = LabelEncoder()
+    X[:, 2] = labelencoder_X_2.fit_transform(X[:, 2])
+    onehotencoder = OneHotEncoder(categorical_features = [1])
+    X = onehotencoder.fit_transform(X).toarray()
+    X = X[:, 1:]
+                        </code>
+                    </pre>
+                </div>
+            </div>
+
+            <div class="mt-10 w-full mx-auto">
+                <div class="text-center mt-4 py-2 font-medium text-xl"><span class="font-extrabold">Step 4=></span> Step 4. Here we must Split our data into training and testing sets, which are divided in ratio of 4:1, So, we generate
+                X_test, X_train, y_test, y_train from out master dataset. <br>
+                It is clearly visible in the variable explorer shown below, it also depicts how our new data has been encoded into new
+                values.
+                </div>
+                <div class="flex justify-center">
+                    <pre class="text-center" style="width: 800px;">
+                        <code class="language-python">
+    # Splitting the dataset into the Training set and Test set
+    from sklearn.model_selection import train_test_split
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0)
+                        </code>
+                    </pre>
+                </div>
+                <div class="my-3">
+                    <img class="mx-auto" src="./images/table2.png" alt="demo-table" width="70%" height="60%">
+                </div>
+            </div>
+
+            <div class="mt-10 w-full mx-auto flex justify-center">
+                <div>
+                    <div class="my-7">
+                        <pre class="text-center" style="width: 800px;">
+                            <code class="language-python">
+    # Importing the Keras libraries and packages
+    import keras
+    from keras.models import Sequential
+    from keras.layers import Dense
+    from keras.layers import Dropout
+                            </code>
+                        </pre>
+                    </div>
+
+                    <div class="my-7">
+                        <pre class="text-center" style="width: 800px;">
+                            <code class="language-python">
+    # Adding the input layer and the first hidden layer
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu', input_dim = 11))
+    # classifier.add(Dropout(p = 0.1))
+
+    # Adding the second hidden layer
+    classifier.add(Dense(units = 6, kernel_initializer = 'uniform', activation = 'relu'))
+    # classifier.add(Dropout(p = 0.1))
+
+    # Adding the output layer
+    classifier.add(Dense(units = 1, kernel_initializer = 'uniform', activation = 'sigmoid'))
+                            </code>
+                        </pre>
+                    </div>
+
+                    <div class="my-7">
+                        <pre class="text-center" style="width: 800px;">
+                            <code class="language-python">
+    # Compiling the ANN
+    classifier.compile(optimizer = 'adam', loss = 'binary_crossentropy', metrics = ['accuracy'])
+
+    # Fitting the ANN to the Training set
+    classifier.fit(X_train, y_train, batch_size = 32, epochs = 100)
+                            </code>
+                        </pre>
+                    </div>
+
+                    <div class="my-7">
+                        <pre class="text-center" style="width: 800px;">
+                            <code class="language-python">
+    # Predicting a single new observation
+    """Predict if the customer with the following informations will leave the bank:
+    Geography: France
+    Credit Score: 600
+    Gender: Male
+    Age: 40
+    Tenure: 3
+    Balance: 60000
+    Number of Products: 2
+    Has Credit Card: Yes
+    Is Active Member: Yes
+    Estimated Salary: 50000"""
+    new_prediction = classifier.predict(sc.transform(np.array([[0.0, 0, 600, 1, 40, 3, 60000, 2, 1, 1, 50000]])))
+    new_prediction = (new_prediction > 0.5)
+                            </code>
+                        </pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="my-3 flex">
+                <img class="mx-auto" src="./images/output.jpg" alt="demo-table" width="40%" height="30%">
+                <div class="flex flex-col items-center justify-center mx-12">
+                    <div class="text-3xl font-medium my-3">The best highest achieved accuracy is <b class="text-5xl">86.39%</b></div>
+                    <div class="text-lg font-medium">The accuracy in starting epochs was determined to be around 83% which has been improved to 86% with each epoch
+                    increment.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
